@@ -1,5 +1,5 @@
 /**
- * Custom simple URL redirecter
+ * Custom simple URL shortener
  */
 
 let express = require('express');
@@ -59,7 +59,7 @@ app.get('^/:keyword([a-z0-9-]{1,200})$', (req, res, next) => {
  * Handle errors
  */
 app.use((req, res) => {
-  res.status(404).send('Not found');
+  res.sendFile('index.html', { root: __dirname });
 });
 
 

@@ -1,6 +1,6 @@
 {
   "name": "knife-short",
-  "description": "Custom simple URL redirecter",
+  "description": "Custom simple URL shortener",
   "author": {
     "name": "Anton Lukin",
     "email": "anton@lukin.me",
