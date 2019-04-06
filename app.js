@@ -31,7 +31,7 @@ let pool = mysql.createPool({
 /**
  * Route primary named location
  */
-app.get('^/:keyword([a-z0-9-]{1,200})$', (req, res, next) => {
+app.get('^/:keyword([a-z0-9-]{1,200})/?$', (req, res, next) => {
   pool.getConnection((err, database) => {
     if (err) {
       return next();
@@ -67,3 +67,4 @@ app.use((req, res) => {
  * Let's roll
  */
 app.listen(port);
+
