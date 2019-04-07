@@ -1,20 +1,17 @@
-SET NAMES utf8;
-SET time_zone = '+00:00';
-SET foreign_key_checks = 0;
-SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
-
 DROP TABLE IF EXISTS `urls`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `urls` (
-  `keyword` varchar(200) NOT NULL,
-  `url` text NOT NULL,
-  `title` text,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `keyword` varchar(200) CHARACTER SET utf8mb4 NOT NULL,
+  `url` text CHARACTER SET utf8mb4 NOT NULL,
+  `title` text CHARACTER SET utf8mb4,
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `ip` varchar(41) NOT NULL,
+  `ip` varchar(41) CHARACTER SET utf8mb4 NOT NULL,
   `clicks` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`keyword`),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `keyword` (`keyword`),
   KEY `timestamp` (`timestamp`),
   KEY `ip` (`ip`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-INSERT INTO `urls` (`keyword`, `url`, `title`, `timestamp`, `ip`, `clicks`) VALUES
-('knife', 'https://knife.media', 'Page Title', '2000-01-01 00:00:00', '127.0.0.1', 0);
+) ENGINE=InnoDB AUTO_INCREMENT=3857 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
