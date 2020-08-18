@@ -34,13 +34,13 @@ let pool = mysql.createPool({
 app.get('^/:keyword([a-z0-9-]{1,200})/?$', (req, res, next) => {
   pool.getConnection((err, database) => {
     if (err) {
-      return next();
+      return next(err);
     }
 
     // Find long url by keyword
     database.query('SELECT * FROM `urls` WHERE `keyword` = ? LIMIT 1', req.params.keyword, (err, rows) => {
       if (err || rows.length === 0) {
-        return next();
+        return next(err);
       }
 
       // Increment clicks field
@@ -57,6 +57,18 @@ app.get('^/:keyword([a-z0-9-]{1,200})/?$', (req, res, next) => {
 
 /**
  * Handle errors
+ */
+app.use((err, req, res, next) => {
+  if (err.message) {
+    console.error(err.message);
+  }
+
+  return next();
+});
+
+
+/**
+ * Show default index template
  */
 app.use((req, res) => {
   res.sendFile('index.html', { root: __dirname });
