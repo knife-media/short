@@ -11,6 +11,6 @@
   "dependencies": {
     "dotenv": "^7.0.0",
     "express": "4.x",
-    "mysql": "*"
+    "mysql2": "^2.3.3"
   }
 }
