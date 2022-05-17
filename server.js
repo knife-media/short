@@ -15,17 +15,20 @@ app.get('^/:source(tg|vk|fb|ok)/:keyword(*)', async (req, res, next) => {
     }
 
     // We make sure links are case insensitive
-    const keyword = req.params.keyword.toLowerCase();
+    let keyword = req.params.keyword.toLowerCase();
 
     if (!keyword.match(/^[a-z0-9-_\/]+$/)) {
       return next();
     }
 
+    // Remove trailing slashes
+    keyword = keyword.replace(/^\/+|\/+$/g, '');
+
     const sources = {
-      tg: '?utm_medium=telegram',
-      vk: '?utm_medium=vkontakte',
-      ok: '?utm_medium=odnoklassniki',
-      fb: '?utm_medium=facebook'
+      tg: '?utm_source=telegram&utm_medium=editorial',
+      vk: '?utm_source=vkontakte&utm_medium=editorial',
+      ok: '?utm_source=odnoklassniki&utm_medium=editorial',
+      fb: '?utm_source=facebook&utm_medium=editorial'
     };
 
     const query = 'INSERT INTO social (keyword, source) VALUES (?, ?) ON DUPLICATE KEY UPDATE clicks = clicks + 1';

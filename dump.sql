@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS `social`;
 CREATE TABLE `social` (
   `id` int NOT NULL AUTO_INCREMENT,
   `keyword` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `clicks` int unsigned NOT NULL DEFAULT '0',
+  `clicks` int unsigned NOT NULL DEFAULT '1',
   `source` set('tg','fb','vk','ok') CHARACTER SET utf8mb3 COLLATE utf8_general_ci NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `keyword_social` (`keyword`,`source`)
