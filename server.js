@@ -6,9 +6,13 @@ const database = require('./utils/database');
 const app = express();
 
 /**
- * Redirect knife.media posts with social sources
+ * Redirect content posts with social sources
  */
 app.get('^/:source(tg|vk|fb|ok)/:keyword(*)', async (req, res, next) => {
+  if (req.headers.host === process.env.PROMO_HOST) {
+    return next();
+  }
+
   try {
     if (!req.params.keyword) {
       return next();
@@ -36,7 +40,7 @@ app.get('^/:source(tg|vk|fb|ok)/:keyword(*)', async (req, res, next) => {
     // Make database query
     await database.query(query, [keyword, req.params.source]);
 
-    res.redirect('https://knife.media/' + keyword + sources[req.params.source]);
+    res.redirect(process.env.CONTENT_ORIGIN + keyword + sources[req.params.source]);
   } catch(err) {
     return next(err);
   }
@@ -46,15 +50,17 @@ app.get('^/:source(tg|vk|fb|ok)/:keyword(*)', async (req, res, next) => {
  * Route primary named location
  */
 app.get('^/:keyword([a-z0-9-]{1,200})/?$', async (req, res, next) => {
+  const query = 'SELECT * FROM urls WHERE keyword = ? AND host = ? LIMIT 1';
+
   try {
-    const [rows] = await database.query('SELECT * FROM urls WHERE keyword = ? LIMIT 1', [req.params.keyword]);
+    const [rows] = await database.query(query, [req.params.keyword, req.headers.host]);
 
     if (rows.length === 0) {
       return next();
     }
 
     // Make database query
-    await database.query('UPDATE urls SET clicks = clicks + 1 WHERE keyword = ?', [req.params.keyword]);
+    await database.query('UPDATE urls SET clicks = clicks + 1 WHERE id = ?', [rows[0].id]);
 
     res.redirect(rows[0].url);
   } catch(err) {
@@ -77,6 +83,10 @@ app.use((err, req, res, next) => {
  * Show default index template
  */
 app.use((req, res) => {
+  if (req.headers.host === process.env.PROMO_HOST) {
+    return res.redirect(process.env.PROMO_ORIGIN);
+  }
+
   res.sendFile('index.html', { root: __dirname });
 });
 
