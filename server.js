@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const express = require('express');
 const database = require('./utils/database');
+const requests = require('./utils/requests');
 
 const app = express();
 
@@ -41,6 +42,47 @@ app.get('^/:source(tg|vk|fb|ok)/:keyword(*)', async (req, res, next) => {
     await database.query(query, [keyword, req.params.source]);
 
     res.redirect(process.env.CONTENT_ORIGIN + keyword + sources[req.params.source]);
+  } catch(err) {
+    return next(err);
+  }
+});
+
+/**
+ * Route ord location
+ */
+app.get('^/ord/?', async (req, res, next) => {
+  if (Object.keys(req.query).length < 1) {
+    return next();
+  }
+
+  const params = new URLSearchParams(req.query).toString();
+
+  // Create source AdFox link
+  const source = process.env.ADFOX_LINK + '?' + params;
+
+  try {
+    const [rows] = await database.query('SELECT * FROM ord WHERE params = ? LIMIT 1', [params]);
+
+    if (rows.length < 1) {
+      const destination = await requests.destination(source);
+
+      if (destination !== null) {
+        await database.query('INSERT INTO ord (params, destination, clicks) VALUES (?, ?, 1)', [params, destination]);
+      }
+
+      return res.redirect(source);
+    }
+
+    // Update clicks for this url
+    await database.query('UPDATE ord SET clicks = clicks + 1 WHERE params = ?', [params]);
+
+    const available = await requests.available(source);
+
+    if (available) {
+      return res.redirect(source);
+    }
+
+    res.redirect(rows[0].destination);
   } catch(err) {
     return next(err);
   }
