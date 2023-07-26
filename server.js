@@ -58,7 +58,7 @@ app.get('^/ord/?', async (req, res, next) => {
   const params = new URLSearchParams(req.query).toString();
 
   // Create source AdFox link
-  const source = process.env.ADFOX_LINK + '?' + params;
+  const source = process.env.ADFOX_LINK + '?' + params + '&pr=' + Date.now();
 
   try {
     const [rows] = await database.query('SELECT * FROM ord WHERE params = ? LIMIT 1', [params]);
@@ -73,8 +73,14 @@ app.get('^/ord/?', async (req, res, next) => {
       return res.redirect(source);
     }
 
+    const row = rows[0];
+
     // Update clicks for this url
     await database.query('UPDATE ord SET clicks = clicks + 1 WHERE params = ?', [params]);
+
+    if (row.status === 'dead') {
+      return res.redirect(row.destination);
+    }
 
     const available = await requests.available(source);
 
@@ -82,7 +88,14 @@ app.get('^/ord/?', async (req, res, next) => {
       return res.redirect(source);
     }
 
-    res.redirect(rows[0].destination);
+    const created = new Date(row.created).valueOf();
+
+    // For 404 links with more than 14 days from creation
+    if (created < Date.now() - 1000 * 3600 * 24 * 14) {
+      await database.query('UPDATE ord SET status = ? WHERE params = ?', ['dead', params]);
+    }
+
+    res.redirect(row.destination);
   } catch(err) {
     return next(err);
   }
