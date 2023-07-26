@@ -1,9 +1,22 @@
+-- Adminer 4.8.1 MySQL 8.0.33-0ubuntu0.22.04.2 dump
+
 SET NAMES utf8;
 SET time_zone = '+00:00';
 SET foreign_key_checks = 0;
 SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 
 SET NAMES utf8mb4;
+
+DROP TABLE IF EXISTS `ord`;
+CREATE TABLE `ord` (
+  `params` varchar(256) COLLATE utf8mb4_general_ci NOT NULL,
+  `destination` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
+  `clicks` int unsigned NOT NULL,
+  `status` enum('dead','alive') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'alive',
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY `params` (`params`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 
 DROP TABLE IF EXISTS `social`;
 CREATE TABLE `social` (
@@ -28,3 +41,6 @@ CREATE TABLE `urls` (
   UNIQUE KEY `keyword_host` (`keyword`,`host`),
   KEY `timestamp` (`timestamp`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+
+-- 2023-07-26 13:07:00
